@@ -259,6 +259,56 @@ contract CharityTracker is Ownable, ReentrancyGuard, Pausable {
     }
 
     // =============================================================
+    //                    ERC20 DONATION
+    // =============================================================
+
+    /// @notice Donate ERC20 tokens to a project
+    /// @param projectId The ID of the project to donate to
+    /// @param amount The amount of tokens to donate
+    /// @dev Only works for projects that accept ERC20 donations. Updates all donation accounting.
+    ///      Follows CEI pattern for security. Reverts if project doesn't exist, is inactive,
+    ///      is completed, doesn't accept ERC20, or if allowance/balance is insufficient.
+    function donateERC20(uint256 projectId, uint256 amount) external whenNotPaused nonReentrant {
+        // Validation Checks (CEI Pattern - Checks)
+        if (projects[projectId].id == 0) {
+            revert Errors.ProjectNotFound();
+        }
+        if (!projects[projectId].isActive) {
+            revert Errors.ProjectNotActive();
+        }
+        if (projects[projectId].isCompleted) {
+            revert Errors.ProjectAlreadyCompleted();
+        }
+        if (amount == 0) {
+            revert Errors.InvalidDonationAmount();
+        }
+        if (projects[projectId].donationToken == address(0)) {
+            revert Errors.InvalidDonationToken();
+        }
+
+        // Check allowance and balance
+        IERC20 token = IERC20(projects[projectId].donationToken);
+        if (token.allowance(msg.sender, address(this)) < amount) {
+            revert Errors.InsufficientAllowance();
+        }
+        if (token.balanceOf(msg.sender) < amount) {
+            revert Errors.InsufficientBalance();
+        }
+
+        // State Changes (CEI Pattern - Effects)
+        donorContributions[projectId][msg.sender] += amount;
+        totalProjectDonations[projectId] += amount;
+        projects[projectId].totalDonated += amount;
+        projects[projectId].balance += amount;
+
+        // External Calls (CEI Pattern - Interactions)
+        token.transferFrom(msg.sender, address(this), amount);
+
+        // Events
+        emit DonationReceived(projectId, msg.sender, amount);
+    }
+
+    // =============================================================
     //                       ETH HANDLING
     // =============================================================
 

@@ -7,7 +7,7 @@ import {Pausable} from "@openzeppelin/contracts/utils/Pausable.sol";
 
 /// @title CharityTracker
 /// @notice Milestone-based charity donation escrow with weighted donor voting (ETH + ERC20).
-/// @dev Phase 3: NGO management functions implemented.
+/// @dev Phase 4: Project creation with milestone validation implemented.
 contract CharityTracker is Ownable, ReentrancyGuard, Pausable {
     // =============================================================
     //                           EVENTS
@@ -29,6 +29,11 @@ contract CharityTracker is Ownable, ReentrancyGuard, Pausable {
     error NGOAlreadyVerified(address ngo);
     error NGONotVerified(address ngo);
     error InvalidNGOAddress();
+    error NotVerifiedNGO();
+    error InvalidGoal();
+    error InvalidMilestoneArrays();
+    error InvalidMilestoneAmount();
+    error MilestoneSumExceedsGoal();
 
     // =============================================================
     //                      DATA STRUCTURES
@@ -149,6 +154,92 @@ contract CharityTracker is Ownable, ReentrancyGuard, Pausable {
     /// @return True if the address is a verified NGO, false otherwise
     function isVerifiedNGO(address ngo) external view returns (bool) {
         return verifiedNGOs[ngo];
+    }
+
+    // =============================================================
+    //                      PROJECT CREATION
+    // =============================================================
+
+    /// @notice Create a new project with milestones
+    /// @param donationToken The token address for donations (address(0) for ETH)
+    /// @param goal The total fundraising goal for the project
+    /// @param descriptions Array of milestone descriptions
+    /// @param amounts Array of milestone funding amounts (must match descriptions length)
+    /// @return projectId The ID of the newly created project
+    /// @dev Only verified NGOs can create projects. All milestones must be defined upfront.
+    ///      Sum of milestone amounts must be <= goal. Milestone IDs start at 0.
+    function createProject(
+        address donationToken,
+        uint256 goal,
+        string[] memory descriptions,
+        uint256[] memory amounts
+    ) external whenNotPaused returns (uint256 projectId) {
+        // Check: Caller is verified NGO
+        if (!verifiedNGOs[msg.sender]) {
+            revert NotVerifiedNGO();
+        }
+
+        // Check: Goal > 0
+        if (goal == 0) {
+            revert InvalidGoal();
+        }
+
+        // Check: Descriptions and amounts arrays have same length
+        if (descriptions.length != amounts.length) {
+            revert InvalidMilestoneArrays();
+        }
+
+        // Check: At least one milestone
+        if (descriptions.length == 0) {
+            revert InvalidMilestoneArrays();
+        }
+
+        // Check: All amounts > 0 and sum <= goal
+        uint256 totalAmounts = 0;
+        for (uint256 i = 0; i < amounts.length; i++) {
+            if (amounts[i] == 0) {
+                revert InvalidMilestoneAmount();
+            }
+            totalAmounts += amounts[i];
+        }
+
+        // Check: Sum of amounts <= goal
+        if (totalAmounts > goal) {
+            revert MilestoneSumExceedsGoal();
+        }
+
+        // Increment project counter (starts at 1)
+        projectCounter++;
+        projectId = projectCounter;
+
+        // Create and store project
+        projects[projectId] = Project({
+            id: projectId,
+            ngo: msg.sender,
+            donationToken: donationToken,
+            goal: goal,
+            totalDonated: 0,
+            balance: 0,
+            currentMilestone: 0, // Start at milestone 0
+            isActive: true,
+            isCompleted: false
+        });
+
+        // Store milestone count
+        projectMilestoneCount[projectId] = descriptions.length;
+
+        // Initialize all milestones
+        for (uint256 i = 0; i < descriptions.length; i++) {
+            milestones[projectId][i] = Milestone({
+                description: descriptions[i],
+                amountRequested: amounts[i],
+                approved: false,
+                fundsReleased: false,
+                voteWeight: 0
+            });
+        }
+
+        emit ProjectCreated(projectId, msg.sender);
     }
 
     // =============================================================

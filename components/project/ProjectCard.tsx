@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { memo, useMemo } from "react";
 import { type Project } from "@/types/contract";
 import { Card, CardBody, CardFooter } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -15,8 +16,9 @@ export interface ProjectCardProps {
 
 /**
  * ProjectCard component for displaying project information in a card
+ * Memoized to prevent unnecessary re-renders
  */
-export function ProjectCard({ project }: ProjectCardProps) {
+export const ProjectCard = memo(function ProjectCard({ project }: ProjectCardProps) {
   const { openDonateModal } = useUIStore();
 
   const handleDonateClick = (e: React.MouseEvent) => {
@@ -24,35 +26,46 @@ export function ProjectCard({ project }: ProjectCardProps) {
     e.stopPropagation();
     openDonateModal(project.id);
   };
-  // Calculate progress percentage
-  const progressPercentage =
-    project.goal > BigInt(0)
-      ? formatPercentage(Number(project.totalDonated), Number(project.goal))
-      : "0.0";
 
-  // Determine if token is ETH (address(0)) or ERC20
-  const isETH = project.donationToken === "0x0000000000000000000000000000000000000000" || !isAddress(project.donationToken);
-  const isUSDC = project.donationToken.toLowerCase() === USDC_ADDRESS.toLowerCase();
+  // Memoize expensive calculations
+  const { progressPercentage, formattedGoal, formattedDonated, status } = useMemo(() => {
+    // Calculate progress percentage
+    const progress =
+      project.goal > BigInt(0)
+        ? formatPercentage(Number(project.totalDonated), Number(project.goal))
+        : "0.0";
 
-  // Format amounts based on token type
-  const formattedGoal = isETH
-    ? `${formatEther(project.goal)} ETH`
-    : isUSDC
-    ? `${formatUSDC(project.goal)} USDC`
-    : `${formatEther(project.goal)} tokens`;
+    // Determine if token is ETH (address(0)) or ERC20
+    const isETH = project.donationToken === "0x0000000000000000000000000000000000000000" || !isAddress(project.donationToken);
+    const isUSDC = project.donationToken.toLowerCase() === USDC_ADDRESS.toLowerCase();
 
-  const formattedDonated = isETH
-    ? formatEther(project.totalDonated)
-    : isUSDC
-    ? formatUSDC(project.totalDonated)
-    : formatEther(project.totalDonated);
+    // Format amounts based on token type
+    const goal = isETH
+      ? `${formatEther(project.goal)} ETH`
+      : isUSDC
+      ? `${formatUSDC(project.goal)} USDC`
+      : `${formatEther(project.goal)} tokens`;
 
-  // Determine status
-  const status = project.isCompleted
-    ? { label: "Completed", color: "bg-slate-grey text-white" }
-    : project.isActive
-    ? { label: "Active", color: "bg-emerald-green text-white" }
-    : { label: "Inactive", color: "bg-slate-grey text-white opacity-50" };
+    const donated = isETH
+      ? formatEther(project.totalDonated)
+      : isUSDC
+      ? formatUSDC(project.totalDonated)
+      : formatEther(project.totalDonated);
+
+    // Determine status
+    const projectStatus = project.isCompleted
+      ? { label: "Completed", color: "bg-slate-grey text-white" }
+      : project.isActive
+      ? { label: "Active", color: "bg-emerald-green text-white" }
+      : { label: "Inactive", color: "bg-slate-grey text-white opacity-50" };
+
+    return {
+      progressPercentage: progress,
+      formattedGoal: goal,
+      formattedDonated: donated,
+      status: projectStatus,
+    };
+  }, [project.goal, project.totalDonated, project.donationToken, project.isCompleted, project.isActive]);
 
   return (
     <Link href={`/project/${project.id}`}>
@@ -122,5 +135,5 @@ export function ProjectCard({ project }: ProjectCardProps) {
       </Card>
     </Link>
   );
-}
+});
 

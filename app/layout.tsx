@@ -1,10 +1,18 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import dynamic from "next/dynamic";
 import "./globals.css";
 import { Providers } from "@/components/Providers";
 import { NetworkError } from "@/components/web3/NetworkError";
-import { DonateModal } from "@/components/donation/DonateModal";
-import { CreateProjectModal } from "@/components/project/CreateProjectModal";
+
+// Lazy load modals for code splitting
+const DonateModal = dynamic(() => import("@/components/donation/DonateModal").then((mod) => ({ default: mod.DonateModal })), {
+  ssr: false,
+});
+
+const CreateProjectModal = dynamic(() => import("@/components/project/CreateProjectModal").then((mod) => ({ default: mod.CreateProjectModal })), {
+  ssr: false,
+});
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

@@ -44,6 +44,10 @@ export function ProjectList({ searchQuery = "" }: ProjectListProps) {
     return filtered;
   }, [projects, filterStatus, searchQuery]);
 
+  // Memoize filter counts
+  const activeCount = useMemo(() => projects.filter((p) => p.isActive && !p.isCompleted).length, [projects]);
+  const completedCount = useMemo(() => projects.filter((p) => p.isCompleted).length, [projects]);
+
   // Loading state
   if (isLoading) {
     return <ProjectListSkeleton count={6} />;
@@ -102,7 +106,7 @@ export function ProjectList({ searchQuery = "" }: ProjectListProps) {
               : "bg-gray-100 text-slate-grey hover:bg-gray-200"
           }`}
         >
-          Active ({projects.filter((p) => p.isActive && !p.isCompleted).length})
+          Active ({activeCount})
         </button>
         <button
           onClick={() => setFilterStatus("completed")}
@@ -112,7 +116,7 @@ export function ProjectList({ searchQuery = "" }: ProjectListProps) {
               : "bg-gray-100 text-slate-grey hover:bg-gray-200"
           }`}
         >
-          Completed ({projects.filter((p) => p.isCompleted).length})
+          Completed ({completedCount})
         </button>
       </div>
 

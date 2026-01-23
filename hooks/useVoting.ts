@@ -1,7 +1,8 @@
-import { useReadContract } from "wagmi";
+import { useReadContract, useAccount } from "wagmi";
 import { CHARITY_TRACKER_ADDRESS, CHARITY_TRACKER_ABI } from "@/lib/contract";
 import { type VoteStatus } from "@/types/contract";
 import { formatPercentage } from "@/lib/utils";
+import { type Address } from "viem";
 
 /**
  * Type guard to check if data is a tuple/array
@@ -66,6 +67,35 @@ export function useMilestoneVoteStatus(
     voteStatus,
     quorumPercentage,
     quorumMet,
+    isLoading,
+    isError,
+    error,
+  };
+}
+
+/**
+ * Hook to check if a donor has voted on a milestone
+ */
+export function useHasVoted(
+  projectId: number | bigint,
+  milestoneId: number | bigint,
+  donorAddress: Address | undefined
+) {
+  const { data, isLoading, isError, error } = useReadContract({
+    address: CHARITY_TRACKER_ADDRESS,
+    abi: CHARITY_TRACKER_ABI,
+    functionName: "hasDonorVoted",
+    args: [BigInt(projectId), BigInt(milestoneId), donorAddress!],
+    query: {
+      enabled: projectId > 0 && milestoneId >= 0 && !!donorAddress,
+    },
+  });
+
+  // Return boolean (default to false if not voted or error)
+  const hasVoted: boolean = (data as boolean | undefined) ?? false;
+
+  return {
+    hasVoted,
     isLoading,
     isError,
     error,

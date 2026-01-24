@@ -10,6 +10,7 @@ import { WalletConnect } from "@/components/web3/WalletConnect";
 import { NetworkSwitcher } from "@/components/web3/NetworkSwitcher";
 import { Spinner } from "@/components/ui/Spinner";
 import { Card, CardBody } from "@/components/ui/Card";
+import { Button } from "@/components/ui/Button";
 import { formatAddress, formatEther, formatUSDC, formatNumber } from "@/lib/utils";
 import { isAddress } from "viem";
 import { USDC_ADDRESS } from "@/lib/contract";

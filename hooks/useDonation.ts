@@ -230,17 +230,13 @@ export function useDonateERC20(
       if (currentAllowance < amountParsed) {
         toast.loading("Approving token...", { id: "approve" });
         
-        const approveHash = await writeContract.mutate({
+        // writeContract.mutate() returns void, hash is available via writeContract.data
+        writeContract.mutate({
           address: tokenAddress,
           abi: ERC20_ABI,
           functionName: "approve",
           args: [CHARITY_TRACKER_ADDRESS, amountParsed],
         });
-
-        if (!approveHash) {
-          toast.dismiss("approve");
-          return;
-        }
 
         // Wait for approval confirmation
         // Note: In a production app, you'd want to use a separate useWaitForTransactionReceipt

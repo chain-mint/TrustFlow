@@ -1,5 +1,10 @@
 @import "tailwindcss";
 
+/* Content source paths for Tailwind CSS v4 */
+@source "./pages/**/*.{js,ts,jsx,tsx,mdx}";
+@source "./components/**/*.{js,ts,jsx,tsx,mdx}";
+@source "./app/**/*.{js,ts,jsx,tsx,mdx}";
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -10,6 +15,21 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  
+  /* Custom Charity Tracker Color Palette */
+  --color-deep-blue: #003366;
+  --color-emerald-green: #2ECC71;
+  --color-bitcoin-orange: #F7931A;
+  --color-slate-grey: #333333;
+  --color-electric-purple: #673AB7;
+  --color-charity-red: #E74C3C;
+  
+  /* Color variants for hover, focus, etc. */
+  --color-deep-blue-hover: #004080;
+  --color-emerald-green-hover: #27AE60;
+  --color-bitcoin-orange-hover: #E8820F;
+  --color-electric-purple-hover: #5E35B1;
+  --color-charity-red-hover: #C0392B;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -23,4 +43,46 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Success Animation */
+@keyframes successCheckmark {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes successPulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.success-checkmark {
+  animation: successCheckmark 0.5s ease-out;
+}
+
+.success-pulse {
+  animation: successPulse 2s ease-in-out infinite;
+}
+
+/* Toast Success Styling */
+.toast-success {
+  background-color: var(--color-emerald-green) !important;
+  color: white !important;
+}
+
+.toast-success-icon {
+  color: white !important;
 }

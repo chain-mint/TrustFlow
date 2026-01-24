@@ -1,5 +1,6 @@
 "use client";
 
+import { memo, useMemo } from "react";
 import { type Milestone } from "@/types/contract";
 import { Card, CardBody } from "@/components/ui/Card";
 import { formatEther, formatUSDC } from "@/lib/utils";
@@ -17,44 +18,54 @@ type MilestoneStatus = "completed" | "current" | "pending";
 
 /**
  * MilestoneCard component for displaying milestone information
+ * Memoized to prevent unnecessary re-renders
  */
-export function MilestoneCard({
+export const MilestoneCard = memo(function MilestoneCard({
   milestone,
   index,
   currentMilestoneIndex,
   donationToken,
 }: MilestoneCardProps) {
-  // Determine milestone status
-  const milestoneIndex = BigInt(index);
-  let status: MilestoneStatus = "pending";
-  if (milestone.approved && milestone.fundsReleased) {
-    status = "completed";
-  } else if (milestoneIndex === currentMilestoneIndex) {
-    status = "current";
-  }
+  // Memoize expensive calculations
+  const { status, formattedAmount, borderColor } = useMemo(() => {
+    // Determine milestone status
+    const milestoneIndex = BigInt(index);
+    let milestoneStatus: MilestoneStatus = "pending";
+    if (milestone.approved && milestone.fundsReleased) {
+      milestoneStatus = "completed";
+    } else if (milestoneIndex === currentMilestoneIndex) {
+      milestoneStatus = "current";
+    }
 
-  // Determine if token is ETH or ERC20
-  const isETH = donationToken === "0x0000000000000000000000000000000000000000" || !isAddress(donationToken);
-  const isUSDC = donationToken.toLowerCase() === USDC_ADDRESS.toLowerCase();
+    // Determine if token is ETH or ERC20
+    const isETH = donationToken === "0x0000000000000000000000000000000000000000" || !isAddress(donationToken);
+    const isUSDC = donationToken.toLowerCase() === USDC_ADDRESS.toLowerCase();
 
-  // Format amount based on token type
-  const formattedAmount = isETH
-    ? `${formatEther(milestone.amountRequested)} ETH`
-    : isUSDC
-    ? `${formatUSDC(milestone.amountRequested)} USDC`
-    : `${formatEther(milestone.amountRequested)} tokens`;
+    // Format amount based on token type
+    const amount = isETH
+      ? `${formatEther(milestone.amountRequested)} ETH`
+      : isUSDC
+      ? `${formatUSDC(milestone.amountRequested)} USDC`
+      : `${formatEther(milestone.amountRequested)} tokens`;
 
-  // Status border colors
-  const borderColors: Record<MilestoneStatus, string> = {
-    completed: "border-emerald-green border-2",
-    current: "border-bitcoin-orange border-2",
-    pending: "border-slate-grey border opacity-30",
-  };
+    // Status border colors
+    const borderColors: Record<MilestoneStatus, string> = {
+      completed: "border-emerald-green border-2",
+      current: "border-bitcoin-orange border-2",
+      pending: "border-slate-grey border opacity-30",
+    };
+
+    return {
+      status: milestoneStatus,
+      formattedAmount: amount,
+      borderColor: borderColors[milestoneStatus],
+    };
+  }, [milestone, index, currentMilestoneIndex, donationToken]);
 
   return (
     <Card
       variant="outlined"
-      className={`${borderColors[status]} transition-all`}
+      className={`${borderColor} transition-all`}
     >
       <CardBody>
         <div className="flex items-start justify-between mb-3">
@@ -116,5 +127,5 @@ export function MilestoneCard({
       </CardBody>
     </Card>
   );
-}
+});
 

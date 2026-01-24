@@ -1,17 +1,65 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Transparent Charity Tracker (TCT)
 
-## Getting Started
+A transparent blockchain-based charity tracking platform built on Base. Track donations, milestones, and fund releases with full transparency on-chain.
 
-First, run the development server:
+## 🎯 Project Overview
 
+Transparent Charity Tracker is a decentralized application (dApp) that enables transparent charity project management on the blockchain. NGOs can create projects with milestones, donors can contribute ETH or ERC20 tokens, and milestone fund releases require donor voting approval.
+
+### Key Features
+
+- **Transparent Project Management**: All projects, donations, and milestones are recorded on-chain
+- **Multi-Token Support**: Donate with ETH or ERC20 tokens (e.g., USDC)
+- **Milestone-Based Funding**: Projects are broken down into milestones that require donor approval
+- **Voting System**: Donors can vote on milestone fund releases based on their contribution weight
+- **NGO Dashboard**: Verified NGOs can manage their projects and release funds
+- **Real-Time Updates**: React Query for efficient data fetching and caching
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Node.js 18+ and npm/yarn/pnpm
+- A Web3 wallet (MetaMask, WalletConnect, etc.)
+- Base Sepolia testnet ETH (for testing)
+- Git
+
+### Installation
+
+1. Clone the repository:
+```bash
+git clone <repository-url>
+cd tct
+```
+
+2. Install dependencies:
+```bash
+npm install
+# or
+yarn install
+# or
+pnpm install
+```
+
+3. Set up environment variables:
+```bash
+cp .env.example .env.local
+```
+
+Edit `.env.local` and fill in your configuration:
+- `NEXT_PUBLIC_APP_URL`: Your application URL
+- `NEXT_PUBLIC_CHAIN_ID`: Chain ID (84532 for Base Sepolia, 8453 for Base Mainnet)
+- `NEXT_PUBLIC_RPC_URL`: RPC endpoint URL
+- `NEXT_PUBLIC_CHARITY_TRACKER_ADDRESS`: Deployed contract address
+- `NEXT_PUBLIC_USDC_ADDRESS`: USDC token address (if using USDC)
+
+4. Run the development server:
 ```bash
 npm run dev
 # or
 yarn dev
 # or
 pnpm dev
-# or
-bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
@@ -37,8 +85,6 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 
 
 
-<!-- Testnet CONTRACT ADDRESS -->
+<!-- CONTRACT ADDRESS -->
 TRACKER_ADDRESS=0x46c17579afF1635b9d983603ED0b4A1c0823bF3d
-
-<!-- Mainnet CONTRACT ADDRESS -->
-TRACKER_ADDRESS=0x9E61018e304f6Cb911ca76132748CFb2AD6B3176
+NGO_ADDRESS=0xc7b93b317634c08D14D806057F9B4C0EB9E62059

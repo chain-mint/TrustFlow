@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { useConnection, useChainId, useSwitchChain } from "wagmi";
 import { baseSepolia } from "wagmi/chains";
 import { Button } from "@/components/ui/Button";
@@ -14,6 +15,17 @@ export function NetworkError() {
   const { isConnected } = useConnection();
   const chainId = useChainId();
   const switchChain = useSwitchChain();
+  const [mounted, setMounted] = useState(false);
+
+  // Prevent hydration mismatch by only checking after mount
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Don't render until mounted to prevent false positives
+  if (!mounted) {
+    return null;
+  }
 
   // Check if wrong network
   const isWrongNetwork = isConnected && chainId !== BASE_SEPOLIA_CHAIN_ID;

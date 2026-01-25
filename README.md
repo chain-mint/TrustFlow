@@ -128,9 +128,7 @@ We chose **Base** as our platform because:
 
 ## 🌐 Live Demo
 
-> **Note**: Update these links once deployed to production
-
-- **Frontend**: [https://tct.vercel.app](https://tct.vercel.app) (Update with your URL)
+- **Frontend**: [https://tranct.netlify.app](https://tranct.netlify.app) 🚀
 - **Base Sepolia Testnet**: [https://sepolia.basescan.org/address/0x46c17579afF1635b9d983603ED0b4A1c0823bF3d](https://sepolia.basescan.org/address/0x46c17579afF1635b9d983603ED0b4A1c0823bF3d)
 - **Base Mainnet**: [`0x9E61018e304f6Cb911ca76132748CFb2AD6B3176`](https://base.blockscout.com/address/0x9E61018e304f6Cb911ca76132748CFb2AD6B3176)
 
@@ -406,7 +404,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🔗 Links
 
-- **Website**: [Update with your URL]
+- **Website**: [https://tranct.netlify.app](https://tranct.netlify.app)
 - **Documentation**: [Update with your docs URL]
 - **Twitter/X**: [@YourHandle](https://twitter.com/YourHandle)
 - **Discord**: [Your Discord](https://discord.gg/your-server)

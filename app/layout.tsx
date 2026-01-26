@@ -5,6 +5,7 @@ import { Providers } from "@/components/Providers";
 import { NetworkError } from "@/components/web3/NetworkError";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { Modals } from "@/components/Modals";
+import { MiniAppInitializer } from "./MiniAppInitializer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -85,6 +86,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <MiniAppInitializer />
         <ErrorBoundary>
           <Providers>
             {children}
